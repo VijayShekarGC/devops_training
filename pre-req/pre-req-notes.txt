@@ -1,0 +1,619 @@
+With respect to CentOS
+
+
+
+LINUX BASICS:
+
+Shell Types:
+	1. Bourne Shell - Sh Shell
+	2. C Shell - csh or tch
+	3. Z Shell - zsh
+	4. Bourne again Shell - bash   (Most popular)
+
+ehco $SHELL -> prints the shell being used currently, 'SHELL' is called an environment variable.
+
+* Use semicolon (;) to run multiple cmds.
+* every linux system has a super user known as root user which has no restrictions and can perform any task.
+* For a normal user to perform task which only root user could do, use the 'sudo' keyword at the start of the cmd. Will prompt for user's password and after that it should be able
+  to execute the cmd.
+
+
+VI editor cmds:
+1. It has 2 modes, they are: 'command' mode(this will be the default modewhen VI is opened in terminal) and 'insert' mode.
+2. In 'command' mode can give cmd to copy, paste, delete lines or word; navigate between lines ; but can not write .
+3. To switch to the insert mode, type lowercase i. To switch back from insert mode to the command mode, press 'Esc' key.
+operations are available in the command mode:
+	1. move around through the editor using the arrow keys.
+	2. To delete a character, press X.
+	3. Typing dd deletes the entire line.
+	4. To copy a line, type yy.
+	5. And to paste it, type in p.
+	6. To scroll the page up or down, press the CTRL + u for up ; CTRL + u for down.
+	7. Typing in colon ':' takes you to the prompt where you can type in commands.
+	8. To save the changes made to the file and write the file to disk, type ':w filename' (filename is optional)
+	9. To discard any unsaved changes made to the file and quit VI, type in ':q'.
+	10. To save changes and quit, type in ':wq'.
+	11. type '/what_you_want_to_find_in_the_file' and all occurrences of the word 'what_you_want_to_find_in_the_file' is highlighted. To move your cursor to the occurrences, press n.
+
+
+
+Basic cmds:
+1. echo Hi  -> used to print to screen; used to print environment variables; used in scrpits as well
+2. ls -> list files and folders
+3. cs -> used to change directory
+4. pwd -> present working directory is printed on the screen
+5. mkdir -> used to make a new directory
+	5.1 mkdir -p -> used to create hierarchy of directories
+6. rm -r  -> to remove a directory and all its contents
+7. cp -r src-path dest-path -> to copy a directory and all its contents
+8. touch -> creates a new file without any content in it.
+9. cat > filename  -> add contents to the file. Will prompt to enter the content. Pressing enter will go to new line. Pressing ctrl+D will exit this cmd.
+10. cat filename -> view contents of file.
+11. cp src-path dest-path  -> to copy a file.
+12. mv src-path dest-path  -> to move a file (cut and paste like operation is called move)
+	12.1 if src-path dest-path is same and dest-path is just a differnt name for the file then orginal file will be renamed.
+13. rm -> to delete a file.
+14. head filename -> displays first 10 lines of the file 'filename'. With argument -n 4 filename, it will print first 4 line of the file 'filename'.
+15. tail filename -> displays last 10 lines of the file 'filename'. With argument -n 4 filename, it will print last 4 line of the file 'filename'.
+
+
+
+User related cmds:
+14. whoami -> to know which user you are.
+15. id -> gives more info on the current user. like userid, groupsid and groups the user is part of.
+16. su username -> switch to another user, will prompt for the user's password(thw one who you are trying to switch to)
+
+* If you're accessing one system from another system using 'ssh' and you want to login to the other system using a different user than your current user, specify the user name 
+  before the hostname followed by an @ symbol. 
+  ex: ssh vijay@192.168.1.12
+
+* Every Linux system has a super user known as the root user. The root user has no restrictions on the system and can perform any task. Now as a normal user, if you wish to perform
+  actions that can only as a root user such as such as installing and configuring software and services on the system or viewing certain paths such as the root directory, 
+  a root user can make that possible for a regular user by granting them sudo privileges, by making an entry into the /etc/SUDOERS file. Now that user will have root privileges 
+  but doesnt become the root itself. Need to prefix 'sudo' keyword to their cmds. They'll be asked for their password(the normal user's) and on entering the password, cmd is 
+  executed.
+
+
+Download files cmds:
+17. curl website-address -o filename -> used to download content from the website; -o option makes it to put the downloaded content to some file.
+18. wget website-address -o filename -> used to download content from the website; -o option makes it to put the downloaded content to some file.
+
+Check OS version cmds:
+19. ls /etc/*release* -> to check the OS version files. *some_name* is a wildcard, give all those contents with 'some_name' in it.
+20. cat /etc/*release* -> to see the OS version files.
+
+
+Package managers cmds:
+
+RPM - Red-Hat Package Manager. Software extensions will be '.rpm'
+21. rpm -i packagename.rpm  -> to install the package(path should be mentioned if not present in the current dir)
+22. rpm -e packagename.rpm  -> to uninstall the package(path should be mentioned if not present in the current dir)
+23. rpm -q packagename.rpm  -> to get info on that package(path should be mentioned if not present in the current dir)
+
+YUM - A high level package manager using RPM underneath. This cmd installs the package by also installing all the dependencies present for that package. 
+RPM doesnt install the dependencies.
+24. yum install packagename  -> installs the package with all of its dependencies.
+25. yum repolist -> prints the list of repos present for different softwares.
+	25.1 ls /etc/yum.repos.d/
+	25.2 cat /etc/yum.repos.d/CentOS-Base.repo -> will print the URL where all packages are stored.
+26. yum list ansible -> lists the installed package name and version 
+27. yum remove ansible -> uninstalls installed package
+	27.1 urm --showduplicates list ansible -> shows if any duplicates of the softwares are installed(like same software but different versions)
+28. yum install ansible-1.1.1.1  -> installs given version of the package; software name followed by '-' and version and with no space.
+
+
+
+
+Services: They help configure software run in background and make sure they run all the time automatically when servers are rebooted as well as follow the right order of startup.
+29. service httpd start  -> starts a service, starts running the given service.
+30. systemctl start httpd  -> starts a service, starts running the given service.
+31. systemctl stop httpd  -> stops a running service,
+32. systemctl status httpd -> checks th status of a service.
+33. systemctl enable httpd  -> Makes the service to start automatically when system boots up.
+34. systemctl disable httpd -> stops the service from automatically starting when system boots up.
+
+* The systemctl command-line utility is used to manage the system dservices. Configure your program as a systemd service so that it can be used as a service by the systemctl cmd.
+  A systemd service is configured using a systemd unit file which may be located at path - 'etc/systemd/system' (not always). 
+* A systemd unit file file needs to be named with the service that needs to be run in the systemctl cmd and and should have extension '.service'. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NETWORKING BASICS:
+
+Switching and Routing:
+* To connect 2 systems to a network, we need interfaces in both the systems which are able to connect to the network(through switch or a router).
+* To see the interfaces of the hosts(systems) we enter the cmd:
+	ip link
+	o/p: 'eth0' and some others
+* Assume the network(switch) has ip address 192.168.1.0 and the 2 hosts are connected to this switch by their interfaces and these interfaces need to have IP addresses.
+  Assign IP address by the cmd:
+	ip addr add 192.168.1.10/24 dev eth0
+	ip addr add 192.168.1.11/24 dev eth0
+  These 2 hosts can communicate with each other by using the cmd:
+    ping 192.168.1.11
+* The switch can only enable communication within a network, which means it can receive packets from a host on the network and deliver it to other systems within the same network.
+* A router helps connect two networks together and beacause of that it gets two IPs assigned, one on each network.
+* To see the existing routing configuration on a system, run the cmd: 
+	route
+  It displays the Kernel’s routing table.
+
+* To configure a gateway on system B to reach the system on another network, run the cmd:
+	ip add route 192.168.2.0/24 via 192.168.1.1
+	where, 192.168.2.0/24 is another network's address with the subnet mask 
+			192.168.1.1 is the router's address in the current network
+  Similarly these steps need to be done in that another network as well, only then communication b/w 2 different network is possible.
+	ip add route 192.168.1.0/24 via 192.168.2.1
+	
+* Suppose you need to access to internet, say google with the ip addr 172.217.194.0, then connect the router to the internet and then add a new route in the routing table
+	ip add route 172.217.194.0/24 via 192.168.2.1
+
+* Suppose we need to connect to another thing in internet and we dont know their IP , then use default in the cmd:
+	ip add route default via 192.168.2.1
+
+* ip a -> prints details of the host's connection 
+
+* If you want above changes to persist over reboots then you should modifiy the '/etc/network/interfaces' file.
+
+* By Default in Linux, packets are not forwarded from one interface to the another interface for security reasons (which means in the same device there will be many interfaces 
+  and linux wont allow forwarding by default). Whether a system can forward packets is determined by the value in the file named:
+  '/proc/sys/net/ipv4/ip_forward'
+  which by default will be set to zero(0) which is no forwarding. Setting that to one(1) will enable forwarding. 
+  And to persist this change across reboots , modifiy the same value in the file:
+  'etc/sysctl.conf'
+  and there it should be :
+  net.ipv4.ip_forward=1
+  
+  
+
+
+DNS:
+DNS - Domain Name System
+* A system with an IP address can be assigned a name and the current host should know the IP of that system when given its name. You can do that by adding an entry into 
+  '/etc/hosts' file in its system. Ex:
+	192.168.1.11 		db
+* Every time we reference another host by its name from currennt host through a ping command or ssh command or through any of the applications or tools within this system, 
+  it looks into its '/etc/hosts' file to find out the IP address of that host.
+* Translating host name to IP address this way is known as name resolution.
+
+* In muilt host network, it is difficult to manage name resolution as IP addresses of hosts keep changing. A single server who will manage it centrally is called DNS server. 
+  We point all hosts to look up that server if they need to resolve the host name to an IP address instead of its own etc hosts files.
+  
+* Assume our DNS server has the IP 192.168.1.100. Every host has a DNS resolution configuration file at 'etc/resolv.conf'. You add an entry into it specifying the address 
+  of the DNS server. We say 'nameserver' and point it to one 192.168.1.100
+
+* So a system is able to use host name to IP mapping from the '/etc/hosts' file locally as well as from a remote DNS server. If you have an entry in both places then host checks 
+  the entry in the local '/etc/hosts' file and it uses that if it present. If it is not present then it goes the DNS server. 
+ 
+* 1st priority is checking ing '/etc/hosts' file and 2nd priority is checking in remote DNS server. This can be changed as well.
+  The order is defined by an entry in the file 'etc/nsswitch.conf'. In that file, the key named 'host' is having value ' files dns'. Changing it to 'dns files' changes the priority.
+  
+* 8.8.8.8 is a common well-known public name server available on the Internet. Using this as a 'nameserver' in 'etc/resolv.conf' file will map to any websites we want like
+  'youtube.com'. Rather than using this name server locally, we can put this in remote DNS server of or network, so that it avoids doing this in all the systems of the network.
+ 
+* Domain names: 'www.youtube.com' , 'www.google.com'
+  They are called a domain name and it is how IP is translate to names that we can remember on the public Internet just like how we did for our hosts.
+  Now the reason they are in this format separated by dots is to group like things together. 
+* The last portion of the domain name, the .com , the .nets, .edu, .org, etc. are the top-level domains. They represent the intent of the website - 
+  .com for commercial or general purpose,
+  .net for network,
+  .edu for educational organizations,
+  .org for nonprofit organizations.
+
+* Consider www.google.com
+  In Google's case, the dot is the root.
+  root->                                            .
+  top level domain name->                         .com
+  google's domain name ->                        google
+  sub domain->                          mail drive www app maps 
+
+
+* You can use cmd 'nslookup' to query a hostname from a DNS server. But remember, nslookup does not consider the entries in the local etc hosts file. So, if you add an entry into 
+  the local etc hosts file for your web application and if you try to do an nslookup for that web application, it is not going to find it. The entry for your web application has 
+  to be present in your DNS server. nslookup only queries the DNS server. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Application Basics:
+2 types of programming languages: 
+	1. Complied: C, C++, Java etc
+	2. Interpreted : python, Ruby, JS-NodeJS
+	
+
+Java:
+cmds to install in CentOS:-
+	sudo curl https://download.java.net/java/GA/jdk13.0.2/d4173c853231432d94f001e99d882ca7/8/GPL/openjdk-13.0.2_linux-x64_bin.tar.gz --output /opt/openjdk-13.0.2_linux-x64_bin.tar.gz
+	sudo tar -xf /opt/openjdk-13.0.2_linux-x64_bin.tar.gz -C /opt/
+	export PATH=$PATH:/opt/jdk-13.0.2/bin
+	java -version
+
+
+* Java has version from 5 to 13 so far. Version 9 introduced changes that made many popular tools and at the same time it was backward incompatible and some license issue 
+  makng many application stuck at Java 8. 
+* Can download Java from oracle website. 
+* versions were named like 1.5, 1.6, 1.7, 1.8 but from version 9 , versions were named as 9,10,11,12,13.
+* JDK: Java Development Kit. It is a set of tools that will help you develop, build and run Java applications on a system. 
+  You install a kit or a set of tools that helps to do all three. To develop a Java application, you can really just use any text editor to write the code, but once you do, 
+	  to debug your application - jdb (Java debugger)
+	  To document your application source code - javadoc
+	  Once the source code is developed, to build and compile the application - javac(Java Complier)
+	  And the tool that helps archive the code in related libraries - jar(Java archive)
+	  Once build, to run the Java application you need - JRE(Java Runtime Environment) - A Java Runtime Environment is needed to run a Java application on any given system.
+	  You also need the Java command-line utility or the loader that is used to run the application - java
+  So all of these and many other tools together form the JDK. So these tools or commands available in the bin directory after installing java.
+* It’s important to note that in the past before version 9 of Java, JDK and JRE were shipped as separate components.
+
+* The application source code is first developed, then it is compiled and then run. Assume we have a simple code in the file MyClass.java, which is then compiled using the 
+  javac command by specifying the name of the code file. This creates a new file which is the compiled version. We then run the application by running the compiled file using 
+  the java loader, but note that you do not specify the .class extension when running the application using the java command; what you're specifying here is essentially the class name.
+* So our objective is to convert the human-readable code into machine code. But first we convert human-readable code into bytecode using the javac command. The bytecode is then run 
+  inside of java virtual machines known as JVMs. So, this allows us to develop Java applications once and run them anywhere(on any operating system.) where there is a supported 
+  JVM available, making Java cross-platform. 
+* A typical application may have many such files which needs to be complied. They may be dependent on each other or may have dependencies on external libraries to distribute the 
+  application to end-users. We need to package it up and that's where an archiver like 'JAR' can help, it can compress and combine multiple Java.class files and dependent libraries 
+  and assets into a single distributable package. 
+* If in case of a web application, there may be other files such as static files and images that may be part of the application. In that case, all files are packaged into a 
+  'WAR' file, which stands for web archive.
+* To create an archive, use the 'jar cf ' command and specify the name of the output file and then pass in the list of files that need to be part of the archive. Running this command 
+  generates the MyApp.jar output file. When this file is created, it automatically generates a manifest file within the package at path '/META-INF/MANIFEST.MF' 
+  This file contains information about the files packaged in the jar file and any other metadata regarding the application. One such information is the entry point of our application.
+* Once built and distributed, the application can be run on any system with the Java Runtime Environment installed using the Java command, but if you're running a jar file,
+  then you use the jar option before specifying the file name.
+
+* So the build process includes: compiling the code into byte codes, packaging it into jar files and generating documentation on that and manu other steps like tests and 
+  vulnerability scans. accomplished these tasks using the tools part of the Java development Kit directly, like the javac command, jar command, and the javadoc command.
+* There are build tools that can help you automate much of these processes like are Maven, Gradle, and ANT. These tools use configuration files(XML) where you can specify the steps 
+  that you want the build tool to automate, such as the steps in your build process, and these tools automatically execute these steps in that particular order that you have defined.
+  
+  
+
+
+
+
+
+NodeJS: 
+Node.js is a server-side JavaScript environment, they can be used to develop applications such as web servers using JavaScript. NodeJS as the ability to implement large number of 
+concurrent connections by implementing  a non blocking IO model.
+cmds to install:
+	curl -sL https://rpm.nodesource.com/setup_13.x | sudo bash -
+	sudo yum install -y nodejs
+	node -v #to check if installation is successfull
+cmds to run a progrm: 
+	node filename.js
+
+NPM: Node Package Manager, used to download libraries for nodeJS. This npm is automatically installed when nodeJS is installed.
+cmds:
+	1. npm search package_name # Lists all available packages by that time.
+	2. npm install package_name # Download and installs the package for the pwd.
+	3. npm install package_name -g # Download and installs the package globally
+	
+	* Installs the package under the directory 'node_module' under the pwd. Directory with name as package name is created and it contains license, README, package.json(a json file 
+	  which contains the metadata of the package) and another sub directory lib which contains the code of this package.
+	* Two types of modules – built-in modules and external modules. Built-in modules are installed automatically when Node.js runtime is installed for the first time and is 
+	  available for use.  located at the location /user/lib/node_modules on Linux systems. 
+    * an application or a package has a set of dependencies and scripts associated with it. These are recorded in the package.json file.
+
+	
+	
+
+
+
+Python:
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Web Servers:
+
+* A set of code that runs on the server side that is actually hosting the web server and that's the code that's listening for connection from users and querying databases, etc
+  is called as the server-side code or the backend code. Usually written in programming languages like Java, Python or NodeJS
+* The response sent back by the server could be another set of code that runs on the client-side that is used to display webpages and information within the pages, they are 
+  called client-side code or also referred to as front-end code. These are usually in the form of HTML, CSS, and JavaScript. They run on the client-side in the user’s browsers.
+* web servers are responsible for serving web content such as HTML and associated JavaScript and CSS files or images or videos.
+* The application servers are usually the backend which are responsible for business logic. 
+* Web Frameworks provide an easy way to develop the web applications where web servers can listen for requests, perform some operations, and respond back with data. 
+  a web framework is what helps you develop application code. Few examples are: Django/Flask in Python, Spring in Java, Express in NodeJS.
+* Web server is what hosts the application. Basically take all your code that you have developed and put it on a web server. Apache Tomcat, GlassFish, Nginx, Gunicorn, uWSGI are 
+  examples of servers that can host web applications. The web servers run one or more processes that listen on a particular port for requests and performs the required operations
+  and responds back to the users. 
+* Websites can be broadly classified into two types - Static and Dynamic
+  A website that only uses static conten like HTML pages, CSS styling, and images such as could be classified as a static website. There is no real interaction with the server 
+  after the content is served. Ex: Nginx, Apache HTTP server
+  Dynamic websites usually require both static and dynamic content. Ex: Apache Tomcat, Gunicorn, uWSGI
+
+
+Apache Web Server(HTTP server):
+* A web server, which is usually used to serve web content like HTML, CSS, and JavaScript files. It is usually used in conjunction with an application server that acts as a back-end
+  for running business logic, such as an Apache Tomcat server. 
+* cmd to install in centOS:
+	yum install httpd
+  Start the httpd service and check its status. 
+	service start httpd ; service httpd status
+* Every server has a path where it stores the logs. To view the logs and access the files at var/log/httpd directory. So, there are two files - the access logs and the error logs. 
+  The access logs are updated whenever a user accesses the website, and the error logs are updated whenever there is an error.
+* Every server has a configuration file where you configure the different parameters that govern how server operates, such as what port it listens on, where the static content is etc.
+  This config file is present at 'etc/httpd/conf/httpd.conf' path. Any changes in this file requires a httpd service restart.
+	service httpd restart
+* The port it listens on is 80 and it listens from all IPs of the hosts, initially, which can be changed. Accessed by 'localhost:80' in the browser and the default test HTML page
+  is served by Apache web server. The keyword here in the file is 'Listen'. Ex:
+	Listen 80
+	Listen 1.2.3.4:80
+* 'DocumentRoot' keyword is used to mention the path to fetch the static website content. For ex:
+	DocumentRoot /var/www/html
+* 'ServerName' keyword is used to give URL for this static web page. The name given should be configured in the DNS so that, this web page is accessible in a given network. 
+* Apache Web server can host multiple application in a single server with the concept of 'VirutalHost'. The files and configuration of each website application is configured as 
+  a virtual host within the Apache configuration file itself. 'VirutalHost' is a logical divison of Apache web server. Each virtual host can be configured with its own server name 
+  and document root. In the Apache configuration file, you can have additional section specified. For example,
+	<VirutalHost *:80>
+		ServerName www.apples.com
+		DocumentRoot /var/www/apples
+	</VirutalHost>
+  ServerName of these multiple applications will be having same IP in the DNS configuration. Apache HTTP serve is intelligent enough to give the right content.
+  VirtualHost Configurations can be moved and can be present other config file and in the main config file we add the following:
+	Include conf/apples.conf
+
+
+
+Apache Tomcat server:
+* The Apache Tomcat server provides a web server environment, where Java-based web applications can hosted. 
+* So as prerequisite, Java must be installed. So, first, install Java and 
+  then download the Apache Tomcat installation file from the Apache Tomcat downloads page, and then extract the downloaded package. And finally, start the server by running the 
+  startup script within the bin directory of the extracted package.
+* once up, check to make sure that the site is working by visiting port 8080, which is the default port of the tomcat server, of the hosts in a browser.
+* 'bin' dir of the tomcat contains many scripts and among them the startup.sh and shutdown.sh are used to start and stop the tomcat server.
+* 'conf' dir contains many config files, this is where you configure web server, port number, direct traffic b/w diff apps etc.
+	This dir contains 'server.xml' file which contains 'Connector' tag with 'port' attribute . The connector is the endpoint at which the requests are received and 
+	its set to port 8080 by default, which can be changed and requires a restart of tomcat after changing.
+	'web.xml' file is used to deploy and configure web applications.
+* 'logs' dir is where the logs are stored.
+* 'web apps' dir is where web applications hosted by Tomcat server are located and that is where application should be placed.
+	Java application is packaged into 'Web archive - WAR' file and then transfered into this dir. This dir also contains HTML,CSS, JS files as well . If tomcat is already running then 
+	it can detect the application is placed inside this dir, extract the WAR file. After extracting the app will be hosted in the path by the name of the extracted directory, which is 
+	the same as the file name of the WAR file.
+	Verify that the new application was hosted by viewing the logs of the Tomcat server under the logs directory.
+	View your new web application by visiting the URL of the Tomcat server at port 8080 and by appending the name of the application into the URL
+
+
+
+
+
+
+Django/Flask and Gunicorn:
+* They both are web frameworks for python. They can act as web server as well but only for development environment and not for production environment.
+	Running "python main.py" starts the flask web server for development env. Flask listens by default in port 5000.
+*  Gunicorn is web server for serving python based web application. Other ex are uWSGI, Gevent, Twisted Server 
+	Running " gunicorn application_file_name:flask_app_component" starts the server. Gunicorn listens by default in port 8000. option '-w' adds more workers. Example
+	"gunicorn application_file_name:flask_app_component -w 2"
+
+
+
+
+
+
+express.JS and pm2:
+* express.JS is a web framework for Node.js and this application serves static files located in the public directory of the applicatoin code base and API.
+* listens on port 3000.
+* pm2 - Process Manager 2 to run a Node.js web-based application in a production mode with built-in load-balancer.
+* Running the application by "pm2 start starting_point_of_application.js". 
+* For starting multiple instances of the application,i.e, in cluster mode add 'i' parameter and specifying the number of processes you want it to run.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Database:
+* There are 2 types of database. SQL and NO-SQL Database.
+* SQL: Data is stored in rows and group of rows constitutes a Table and group of tables constitutes a Database. Row indicates an entity and column indicates characteristics. 
+       For an entity which does not have a value for current characteristic then the value will be null or empty.
+* NO-SQL: Data is stored in Documents and group of Documents is called a Collection and group of Collection constitutes a Database. 
+          Inside a Document, data is stored in key-value pair like a json file. Each Document is independent of the other and can have as many key-value pairs of data.
+* SQL queries are used to query and filter data from a SQL database. 
+* Examples of SQL databases are MySQL, PostgreSQL, PostgreSQL, Microsoft SQL Server.
+* Examples of NO-SQL databases are MongoDB, DynamoDB, Cassandra.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Security:
+
+
+TLS certifcates:(Using asymmetric encryption in the symmetric encryption is yet to written here)
+* A certificate is used to guarantee trust between two parties during a transaction. For example, when a user tries to access a web server, TLS certificates ensure that the 
+  communication between the user and the server is encrypted and the server is who it says it is.
+* symmetric encryption: It is a secure way of encryption, but uses the same key to encrypt and decrypt the data. Here the key has to be exchanged between the sender and 
+  the receiver and hence there is a risk of a hacker gaining access to the key.
+* asymmetric encryption: Instead of using a single key to encrypt and decrypt data, asymmetric encryption uses a pair of keys named: A private key and a public key.
+* 'ssh-keygen' cmd creates private and public keys. It creates 'id_rsa' which is private key and 'id_rsa.pub' which is a public key.
+* Secure your server by locking down all access to it except through a door that is locked using your public key(lock). It's usually done by adding an entry with your public 
+  key into the server's '/.ssh/authorized_keys' file. And this lock(public key) can only be opened by your private key. Similarly for other users, their public key needs to be
+  added in the above mentioned file and they can open their lock(public key) with their private keys only.
+* The public key is not neccessarily created for one server. The same public key(lock) can be used for other sever as well...just by adding the public key in that file mentioned b4.
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+YAML:
+* Data is represented in key-value pair. There should be a space after the colon to indicate the value. Ex:
+	fruit: value
+* Array/Lists can be represented in yaml.
+	fruits:
+		- orange
+		- apples
+		- banana
+ The dash indicates that it's an element of an array.
+* Dictionaries/Maps can be represented in yaml.
+	banana:
+		cal: 50
+		protein: 5
+		fat: 15
+	apple:
+		cal: 40
+		protein: 4
+		fat: 10
+* You can have lists containing dictionaries containing lists.
+	fruits:
+		- banana:
+			cal: 50
+			protein: 5
+			fat: 15
+		- apple:
+			cal: 40
+			protein: 4
+			fat: 10
+* You can have dictionary within another dictionary.
+* Lists are ordered and Dictionaries/Maps are unordered.
+* Line starting with '#' becomes a comment.
