@@ -1,0 +1,229 @@
+* Shell scripts have extension '.sh'.
+* Shell scripts are run using the 'bash' keyword or by './scipt.sh'. Ex:
+	bash file1.sh
+		or
+	./file1.sh
+* To convert a script to a cmd, add the path of the script in the env variable 'PATH' and do not save the script with the '.sh' extension. Also make sure that it contains the 
+  permission to execute, as usually permissionto execute will not be set. After adding, just enter the file name and it will be taken as a cmd and executed.
+  (Do it once an confirm if this is correct. Confirmed and it works.)
+* Variables: 
+	* A variable always has a dollar sign before its name. 
+	* Set the value for the variable at the beginning of the script. However, while setting the value of a variable, we do not use the dollar sign before the variable name.
+	* Also, note that a variable name may only contain alphanumeric or underscores; and it is case-sensitive as well.
+	* You can also use variables to store the result of another command.Ex:
+		file_output = $(cat $file_name)
+		echo "Output of the file: ${file_output}"
+	* Variable should be encapsulated in { } Ex: Change variable to ${file_name}_bkp
+* Cmd Line Arguments: The cmd we enter in the terminal itself has an index value of zero. So $0 represent the cmd we entered. The next argument we enter in the terminal will have 
+  subsequent index i.e, 1,2,3.... and they can be accessed in the script as $1 or $2 or $3.
+* Reading inputs from the user: Use the 'read' keyword in the script, followed by the variable name the value input by the user should go into. Use the '-p' for printing a 
+  statement in the terminal while asking for a input. 
+  Ex: """ read -p "Enter the value: " input_variable """
+* IF statement: The condition of an IF statement is encapsulated under a pair of square brackets. In the next line, we need to type the 'then' keyword, only after this keyword ,
+  goto the statement and give a tab space and type the actions needed to be performed. Same goes for 'elif'. But for the 'else' at the end, there is no 'then' keyword.
+	*  The comparison statement should be within square brackets, and there should be at least one space between the brackets and your statement, as well as between the operator
+	  and the values on either side. 
+	*  The equals operator is only to be used to compare strings, To check if the status is not equal to failed,  use the != operator. 
+	*  To compare numeric values use the -eq operator. To check if two numbers are not equal, then use the -ne operator. To check if a number is greater than another one, use the -gt operator
+		for greater than. To check if a number is less than another one use the -lt operator.
+* To check if both conditions are true, use the double ampersand sign. To check if either one is true, use the double pi symbol which is ||.EX:
+		[ cond1 ] && [ cond2 ]
+* Loops: A "for" loop is written like this. 1st line says 
+	"""
+	for iteratable_element in list
+	do
+		tasks $iteratable_element
+	done
+	"""
+	* Another way (in the place of a list)is to simply specify the items separated by a space.
+	* specify a range using the sequence expression by using a pair of curly brackets with a starting point and ending point of the sequence separated by 2 dots.
+		"""{0..100}"""
+	*  A while loop syntax is similar to if statement
+	"""
+	while [ $some_variable = "something" ]
+	do	
+		tasks to assign the value to @some_variable
+	done
+	"""
+	* Infinte loop using while:
+	"""
+	while true
+	do
+		tasks
+	done
+	"""
+	* Use break and continue keywords inside the while loop to stop or continue the while loop execution.
+	
+	
+	* Example program of a calculator using while loop:
+Shows a menu driven program with the following options:
+
+Add
+Subtract
+Multiply
+Divide
+Quit
+Depending on the input the program must ask for 2 numbers - Number1 and Number2 and then print the result in the form Answer=6.
+
+The program must then show the menu again until user selects option 5 to quit.
+
+""""
+while true
+do
+  echo "1. Add"
+  echo "2. Subtract"
+  echo "3. Multiply"
+  echo "4. Divide"
+  echo "5. Quit"
+
+  read -p "Enter your choice: " choice
+
+  if [ $choice -eq 1 ]
+  then
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 + $number2 ))
+  elif [ $choice -eq 2 ]
+  then
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 - $number2 ))
+  elif [ $choice -eq 3 ]
+  then
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 * $number2 ))
+  elif [ $choice -eq 4 ]
+  then
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 / $number2 ))
+  elif [ $choice -eq 5 ]
+  then
+    break
+  fi
+
+done
+""""
+
+	* Case statement syntax:
+Pgm 1:
+""""
+month_number=$1
+
+if [ -z $month_number ]
+then
+  echo "No month number given. Please enter a month number as a command line argument."
+  echo "eg: ./print-month-number 5"
+  exit
+fi
+
+if [[ $month_number -lt 1 && $month_number -gt 12 ]]
+then
+  echo "Invalid month number given. Please enter a valid number - 1 to 12."
+  exit
+fi
+
+case $month_number in
+  1) echo "January" ;;
+  2) echo "February" ;;
+  3) echo "March" ;;
+  4) echo "April" ;;
+  5) echo "May" ;;
+  6) echo "June" ;;
+  7) echo "July" ;;
+  8) echo "August" ;;
+  9) echo "September" ;;
+  10) echo "October" ;;
+  11) echo "November" ;;
+  12) echo "December" ;;
+esac
+""""
+
+Pgm 2:
+""""
+while true
+do
+  echo "1. Add"
+  echo "2. Subtract"
+  echo "3. Multiply"
+  echo "4. Divide"
+  echo "5. Quit"
+
+  read -p "Enter your choice: " choice
+
+  case $choice in
+    1)
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 + $number2 ))
+        ;;
+    2)
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 - $number2 ))
+        ;;
+
+    3)
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 * $number2 ))
+        ;;
+    4)
+        read -p "Enter Number1: " number1
+        read -p "Enter Number2: " number2
+        echo Answer=$(( $number1 / $number2 ))
+        ;;
+    5)
+        break
+        ;;
+  esac
+
+done
+""""
+
+	* Shebang: Instructs the terminal to use the mentioned shell .
+	"""#!/bin/bash"""
+	* Exit code should be used in the scripts. If cmds run successfully then exit code must be zero. If any cmd fails then exit code should be greater than 0 (usually 1)
+	Syntax: 
+		"""exit 1"""
+		"""exit 0"""
+	Exit code can also be checked in the terminal by using echo with $?
+	""" echo $?"""
+
+
+
+
+Functions:
+* A function within a shell script is a piece of code or a block of code that performs a particular function that can be reused and repurposed throughout the script.
+* To run that peice of code, call the function by its name and pass in the fuction parameters. And in the function definition these parameters are fetched as $1, $2 and so on 
+  for first parameter and second parameter and so on.
+* Function must be defined first and then called in the order of the script.
+* The return statement within a function call helps in specifying the exit code for that function, it will only exit the function. Return code can be captured just as exit code is
+  captured using  $? built-in variable:
+	function_to_be_called function_param1 function_param2
+	called_functions_status_code=$?
+  Return code only gives the codes same as exit code, it cant return anything else like text.
+Ex 1:
+"""
+fuction add()
+{
+	echo $(( $1 + $2 )) 
+}
+
+sum=$(add 3 5)
+"""
+
+Ex 2:
+"""
+fuction add()
+{
+	return $(( $1 + $2 )) 
+}
+
+(add 3 5)
+sum=$?
+"""
+
+
+
