@@ -9,14 +9,17 @@ Shell Types:
 	2. C Shell - csh or tch
 	3. Z Shell - zsh
 	4. Bourne again Shell - bash   (Most popular)
+	5. korn shell - ksh
 
-ehco $SHELL -> prints the shell being used currently, 'SHELL' is called an environment variable.
+* echo $SHELL -> prints the shell being used currently, 'SHELL' is called an environment variable.
+* To change the default shell, use the command chsh. You will be prompted for the password and the new value of the shell.
+* Bash supports command auto-completion. In Bash, we can set custom aliases for the actual commands. 
+
 
 * Use semicolon (;) to run multiple cmds.
 * every linux system has a super user known as root user which has no restrictions and can perform any task.
 * For a normal user to perform task which only root user could do, use the 'sudo' keyword at the start of the cmd. Will prompt for user's password and after that it should be able
   to execute the cmd.
-
 
 VI editor cmds:
 1. It has 2 modes, they are: 'command' mode(this will be the default modewhen VI is opened in terminal) and 'insert' mode.
@@ -40,6 +43,10 @@ operations are available in the command mode:
 Basic cmds:
 1. echo Hi  -> used to print to screen; used to print environment variables; used in scrpits as well
 2. ls -> list files and folders
+	2.1 ls -l -> prints long lists i.e, with details of all files and folders.
+	2.2 ls -a -> prints hidden files and folders. 
+	2.3 ls -lt -> prints in the order the files were created from newest to oldest.
+	2.4 ls -ltr -> prints in the order the files were created from oldest to newest, r means reverse.
 3. cs -> used to change directory
 4. pwd -> present working directory is printed on the screen
 5. mkdir -> used to make a new directory
@@ -55,7 +62,9 @@ Basic cmds:
 13. rm -> to delete a file.
 14. head filename -> displays first 10 lines of the file 'filename'. With argument -n 4 filename, it will print first 4 line of the file 'filename'.
 15. tail filename -> displays last 10 lines of the file 'filename'. With argument -n 4 filename, it will print last 4 line of the file 'filename'.
-
+16. whatis -> displays a one-line description of what a command does.
+17. man cmd_name -> These provide information about the command in detail, often with examples, use cases, as well as information about the command options. 
+18. apropos keyword -> This cmd will search through the man page names and descriptions for instances of 'keyword'.
 
 
 User related cmds:
