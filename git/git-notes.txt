@@ -1,0 +1,86 @@
+* Git is an open source distributed version control system.
+* Git has to repository types, local and remote. The local repository is on your own machine, so you have direct access to it. The remote repository is usually a centralized server.
+  Data/code can be pulled to local machine and Data/code can be pushed to remote repo.
+
+Stages:
+* The local repository actually consists of three stages:
+	The working area, are all your active changes.
+	The staging area contains new changes that will soon be committed. 
+	The committed area where files from staged area are committed. Storing changes in a local Git repository is called committing.
+  The files that should be included in the commit are first added to the staging area. A commit gets created when a developer actually commits those files.
+* running the following cmd, initializes a git repo in local machine
+	git init
+  After running this, a hidden git folder is created. 
+* Status of the current repo can be know by running 
+	git status
+  It gives info on the branch currently in, staged files, untracked files. 
+* Untracked files can be moved to staging area by running
+	git add file_path/file_name # to move a specific file to staging area
+		or
+	git add * # to move all to staging area
+* Staged files can be commited by running 
+	git commit -m "Commit Message" 
+	-m flag is to give a commit messgae as an cmd line arg.
+
+
+Logs:
+* The commits that were made to the project can be seen by running
+	git log 
+  It shows commit hash, author, date and time and commit message
+	git log --oneline 
+  It shows the logs in brief format
+
+
+Branch:
+* A branch is basically a pointer to the last commit.
+* Create a new branch by running:
+	git branch branch_name
+* Switch to another existing branch by running:
+	git checkout another_branch_name
+* Create a new branch and switch to it by running:
+	git checkout -b branch_name
+  Creates a new branch from the current branch you are in and switch to it.
+	git checkout -b branch_name another_branch_you_want_to_create_from
+  Creates a new branch from another branch and switch to it.
+* Delete a branch by running:
+	git branch -d branch_name
+* To list a;; available branch:
+	git branch 
+* The HEAD points to the last commit in the branch that you're currently on. When you switch branches,the HEAD moves as well and points to the latest commit of that branch.
+* Merge a branch with:
+	git merge branch_name
+  Merges the given branch into our current branch.
+* There are 2 types of merges: Fast-Forward Merge and Non-Fast-Forward Merge. 
+	Fast-Forward Merge: A fast-forward merge can happen when the current branch has no extra commits compared to the branch that we're merging. Git will always try Fast-Forward merge at first. 
+	  This type of merge doesn't create a new commit, but rather merges to commits on the branch that we're merging right into the current branch. 
+	Non-Fast-Forward Merge: If we commit changes on the current branch that the branch we want to merge doesn't have, Git will perform a no-fast-forward merge. 
+	  Git creates a new merging commit on current branch. 
+
+
+
+
+Remote Repo:
+* Add the remote repository to our local project by running:
+	git remote add alias_name URL
+  Usually alias_name will be origin and URL will be github/gitlab repo's URL.
+* List all remote repos configured by running:
+	git remote -v
+* To sync local and remote repo, push the local changesto remote repo by running:
+	git push alias_name_of_remote_repo current_branch_name
+  This cmd needs 2 args, remote repo alias and branch we are pushing.
+* To clone a remote repo to local machine:
+	git clone http_url
+* To fetch changes from remote branch:
+	git fetch alias_name remote_branch_name
+* To merge branch with the branch that was fetched:
+	git merge alias_name/remote_branch_name
+  There is '/' in the arg.
+* To perform fetch and merge at a time:
+	git pull alias_name branch_that_is_present_in_local_and_remote_both.
+*
+
+
+
+
+rebase, revert, reset:
+
