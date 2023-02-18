@@ -1,0 +1,277 @@
+Docker:
+
+Containers: 
+* Containers are completely isolated environments, as in, they can have their own processes or services, their own network interfaces, their own mounts, 
+  just like virtual machines, except they all share the same OS kernel.
+* Some of the different types of containers are LXC, LXD, LXCFS, etc. Docker utilizes LXC containers.
+* A container only lives as long as the process inside it. Containers exits once the task are complete. They ar unlike the Operating Systems.
+
+
+
+Docker Commands:
+* docker 'run' command is used to run a container from an image.
+	docker run nginx
+  Runs an instance of the nginx application on the docker host. If the nginx image is not present on the host it will go out to docker hub and pull it, which is only done for the
+  first time and for the subsequent executions same image will be reused. 
+  
+  The container will run in a forground mode by default i.e, all contents/outputs will be present in the current terminal itself. 
+  To run a container in the background mode use '-d' option:
+	docker run -d image_name
+	
+  To attach a container running in background mode:
+	docker attach container_name/container_id
+	
+  To run a specific version of the image, use the tags:
+	docker run image_name:version_number
+  By default if the tag is not mentioned and just iamge_name is mentioned then the latest version will be run.
+  
+  To run a container in a interactive mode:
+	docker run -i container_name
+  The standard input of your host will be mapped to the docker container. But if there are any promt then that will be present in this mode. Need to use a pseudo terminal for that.
+  
+  To run a pseudo terminal:
+	docker run -t container_name
+
+  Usually both interactive mode and pseudo terminal are used:
+	docker run -it image_name
+
+  To map a port on the container to port on the host, use '-p' option:
+	docker run -p host_port_number:container_port_number image_name
+
+  To map a volume on the container to the volume on the host, use '-v' option:
+	docker run -v host_directory_path:container_directory_path image_name
+  This makes sure that the data present in 'container_directory_path' gets persisted to the 'host_directory_path' in the host.
+  
+  To give our own name to the container:
+	docker run --name our_container_name image_name
+  
+* Docker 'ps' command lists all running containers and some basic information about them such as container I.D., the name of the image, current status and the name of the container.
+  Each container automatically gets a random I.D. and name created for it by Docker
+	docker ps
+  To see all containers running or not use the -a option.
+	docker ps -a
+  This outputs all running as well as previously stopped or exited containers.
+ 
+* To get more information, details on a container, use inspect:
+	docker inside container_name
+  This cmd returns all details of a container in a JSON format, such as the state, mounts, configuration data, network
+ 
+* To view the logs of a container:
+	docker logs container_name
+
+* To stop a container:
+	docker stop container_name/container_id
+	
+* To remove a container permanently:
+	docker rm container_name/container_id	
+  If it prints the container_name/container_id back then the operation is successfull
+  
+* To see the list of images:
+	docker images 
+	
+* To remove a docker image permanently:
+	docker rmi image_name	
+  Stop and delete all dependent containers to be able to delete an image.
+  
+* To only pull an image and not run its container:
+	docker pull image_name
+	
+* To execute a command on a running container:
+	docker exec container_name cmd_to_be_executed
+
+* To set an environment variable for a container, 
+	docker -e env_var_name=env_var_value iamge_name
+
+* To find the environment variable set on a container that's already running:
+	docker inspect container_name
+  In the output of the above cmd, check under the config->env section. 
+
+* Link is a command line option which can be used to link two containers together.
+	docker run -d --name=some_container_name -p host_port_number:container_port_number --link app_or_service_to_be_connected_in_cuurent_container:target_container_name image_name
+  This cmd creates an entry into the '/etc/hosts' file on the current container adding an entry with the 'target_container_name' with an internal IP of the target container.
+
+
+Docker Images:
+* Our own docker images can be built for our application and shipped across.
+* To build a docker images we need a template/instructions and that will be written in a file called 'Dockerfile'
+* To build an image using Dockerfile:
+	docker build path_where_dockerfile_exists -t registry/account_name/image_name:version_number
+  This will create an image locally only and it needs to be pushed to the repo if needed by someone else.
+* Login to the registry is needed before pulling/pushing an image.
+	docker login registry_name
+  This will ask the username and password for that registry.
+  By default registry will be the docker registry which is 'docker.io'
+* To push an image to a registry:
+	docker push registry/account_name/image_name:version_number
+  By default if registry is not provided it will be considered as docker registry only. 
+* Every Docker image must be based off of another image. Either an OS or another image that was created before based on an OS.
+* When Docker builds the images it builds in a layered architecture. Each line of instruction in dockerfile creates a new layer in the docker image with just the changes from
+  the previous layer. Since each layer only stores the changes from the previous layer it is reflected in the size of the docker image as well.
+* All the layers build are cached so the layered architecture helps you restart docker build from that particular step in case it fails or if you were to add new steps in the
+  build process there will be no need to start all over again as it will re-use the previous layers from cache and continue to build the remaining layers. 
+
+
+
+Dockerfile:
+* Dockerfile will be in an instruction and arguments format.
+* In the Docker file everything on the left in CAPS is an instruction. These instructs Docker to perform a specific action while creating the image. 
+  Everything on the right is an argument to those instructions. 
+* All Docker files must start with a 'FROM' instruction and the argument for this instruction is an Base Image.
+* The 'RUN' instruction instructs Docker to run a particular command on those base images
+* The 'COPY' instruction copies files from the local system onto the Docker image.
+* The 'ENTRYPOINT' allows us to specify a command that will be run when the image is run as a container
+
+* If the 'ENTRYPOINT' is used in dockerfile and an cmd-line argument is present(for the command present in ENTRYPOINT) when the container is run, then the commands present in 
+  the ENTRYPOINT will get appended with the cmd-line argument. If cmd-line argument can be absent then for using default values use 'CMD' and specify the argument for the 
+  command in 'ENTRYPOINT'. If we want the override the cmd in 'ENTRYPOINT' then use :
+	docker run --entrypoint new_cmd image_name cmd_line_arg
+* 
+
+
+
+
+
+
+Docker Compose:
+* Docker Compose is a tool used to run and/or build multiple containers (may or may not be related to an application) based on a configuration file which is an 'yaml' file.
+* There are many versions in the configuration files of docker-compose. Versions 1, 2 and 3 are there so far. 
+* Use the following cmd to bring up the containers in the 'docker-compose.yaml' file
+	docker-compose up 
+* Sample docker-compose.yaml file in version 1:
+		"""
+		name_of_containter_1:
+			image: name_of_iamge_for_container_1 # given that image is available in the registry
+			ports:
+				- host_port_number_1:container_port_number_1
+				- host_port_number_2:container_port_number_2
+			links:
+				- target_container_name
+		name_of_containter_2:
+			build: path_of_app_code_and_dockerfile # When 'docker-compose up' is run, this will build the image, give a temporary name for the image and then run the container.
+			ports:
+				- host_port_number_1:container_port_number_1
+				- host_port_number_2:container_port_number_2
+			links:
+				- target_container_name
+		"""
+  In version 1 all the containers used the default network i.e, links were created on default network and couldnt use any other network if needed. There was no order in which the 
+  containers can come up.
+* Sample docker-compose.yaml file in version 2:
+"""
+version: 2
+services:
+	name_of_containter_1:
+		image: name_of_iamge_for_container_1 
+		ports:
+			- host_port_number_1:container_port_number_1
+			- host_port_number_2:container_port_number_2
+		network:
+			- name_of_network_1
+	name_of_containter_2:
+		build: path_of_app_code_and_dockerfile 
+		ports:
+			- host_port_number_1:container_port_number_1
+			- host_port_number_2:container_port_number_2
+		network:
+			- name_of_network_2
+		depends_on:
+			- container_name
+	name_of_containter_3:
+		image: name_of_iamge_for_container_3 
+		ports:
+			- host_port_number_1:container_port_number_1
+			- host_port_number_2:container_port_number_2
+		network:
+			- name_of_network_1
+			- name_of_network_2
+		environment:
+			env_var_name: env_var_value
+network:
+	name_of_network_1: 
+	name_of_network_2:	
+"""
+  * In version 2, by default a new 'bridge' network is created for the containers in this yaml file and they are connected to this bridge network. All containers communicate with 
+    each other using each other's service name / container_name. Hence the links are deprecated in version 2. 
+  * In version 2 we can have the order in which containers can come up. The 'depends_on' key indicates that the current container can up after the container mentioned is up 
+    and running.
+  * We can also create custom network and connect the required containers to those customs network accordingly. 
+  
+  
+
+
+
+
+Docker Engine: 
+* When docker is installed on a linux host, 3 instances of docker engine is installed: docker deamon, REST API server and docker CLI.
+* docker deamon is a background process that manages Docker objects such as the images containers volumes and networks.
+* REST API server is the API interface that programs can use to talk to the deamon and provide instructions. 
+* docker CLI is the command line interface used to perform actions such as running/stopping containers, destroying images etc. It uses the rest api to interact with the docker deamon.
+  docker CLI need not neccesarily be on same host, it can be remote host as well nd interact with the REST API and docker deamon. Use the -H option on the docker command and 
+  specify the remote Docker engine address 
+	docker -H ip_addr_of_remote_docker_engine:port_number run image_name
+* Docker uses namespace to isolate workspace. process IDs, network, interprocess communication, mounts and Unix Timesharing systems are created in their own namespace thereby 
+  providing isolation between containers 
+* Docker host as well as the containers shared the same system resources such as CPU and memory. By default There is no restriction as to how much of a resource a container can use 
+  and hence a container may end up utilizing all of the resources on the underlying host. There is a way to restrict the amount of CPU or memory a container can use. 
+  Docker uses control groups to restrict the amount of hardware resources allocated to each container
+	docker run --cpus=0.5 --memory=100m ubuntu
+  Above cmd ensures the container does not take up more than 50 percent of the cpu of the host and limits the amount of memory the container can use to 100 megabytes.
+
+
+
+
+
+
+Docker Storage:
+* When Docker is instaled on a system, it creates this folder structure at 'var/lib/docker'. Multiple folders are created under it, which are aufs, containers, image, volumes etc.
+  This is where Doctor stores all its data by default. Here data implies files related to images and containers running on the docker host.
+* As docker is an layered architecture, after an image is built the layers beneath will be read-only(call it image-layers). After running the container based on the image, 
+  new writable-layer is created on top of those layers(call it container-layer). writable layer is used to store data created by the container such as log files by the applications, temporary files generated 
+  by the container or just any file modified/created by the user on that container. The life of this writable layer though is only as long as the container is alive. 
+  When the container is destroyed this layer and all of the changes stored in it are also destroyed.
+* COPY-ON-WRITE mechanism: If we modify a file in image-layers, then docker creates a copy of that modified file in container-layer and all future modifications will be done on this
+  file in the container-layer. 
+* If there is a need to persist the data in container-layer then add a persistent volume to the container. First create a volume using:
+	docker volume create name_of_volume 
+  This cmd creates a folder called 'name_of_volume' under '/var/lib/docker/volumes' directory. Use this volume while creating a container:
+	docker run -v name_of_volume: path_of_contents_to_be_stored_in_volumes iamge_name
+  If a new volume is used while running a container which is not created yet, then docker will automatically create the new volume in '/var/lib/docker/volumes' directory. 
+  If we use just a volume name while running, it gets created or use the one in '/var/lib/docker/volumes' directory and this is called as 'volume mounting'.
+  If we use a specific path to a folder while running, that folder will be used to store the data of container-layer and this is called 'bind mounting'.
+	docker -v /data/app_data: /var/lib/mysql image_name
+* The new way to presist data is to use --mount option rather than -v option as mount option is more verbose.
+	docker run --mount type=bind,source=/data/app_data,target=/var/lib/mysql iamge_name
+	docker run --mount type=volume,source=/var/lib/docker/volumes/app_data,target=/var/lib/mysql iamge_name
+* storage drivers like AUFS, BTRFS, ZFS, device-mapper, overlay and overlay 2 performes above operations underneath. Selection of the storage driver depends on the 
+  underlying OS being used and docker selects that automatically which can be changed acc to the needs.   
+
+
+
+
+
+
+Docker Networks:
+* When you install Docker it creates three networks automatically: bridge, none and host. 
+* bridge is the default network a container gets attached to. If there is a need associate the container with any other type network you specify the network information using 
+  the network command line parameter:
+	docker run ubuntu # uses bride
+	docker run image_name --network=host  # uses host
+	docker run image_name --network=none  # uses none
+* Bridge network is a private internal network created by Docker on the host. All containers are attached to this network by default and they get an internal IP address 
+  usually in the range 172.17 series, the containers can access each other using this internal IP if required. to access any of these containers from the outside world map the 
+  ports of these containers to ports on the docker host. 
+* The Host network, takes out any network isolation between the docker host and the docker container as those containers will be using the same networks as the host. Hence to access
+  the containers in host network there will be no need for port mapping. Hence running multiple containers which can be accessed on the same port number will not be possible 
+  as the port for the container is being used by the first container and is blocked.
+* In None network, containers are not attached to any network and doesn't have any access to the external network or other containers, they run in an isolated network. 
+* By default, Docker only creates one internal bridge network. Custom bridge network can be created as well using:
+	docker network create --driver bridge --subnet 182.18.0.1/24 --gateway 182.18.0.1 network_name
+* To list all networks: 
+	docker network ls
+* To see the network settings and the IP address assigned to an existing container:
+	docker inspect container_name
+* To inspect a network:
+	docker network inspect network_name
+* Containers can reach each other using their names. All containers in a docker host can resolve each other with the name of the container Docker has a built in DNS server 
+  that helps the containers to resolve each other using the container name. The built in DNS server always runs at address 127.0.0.11
+* Docker uses network namespaces that creates a separate namespace for each container then uses virtual Ethernet pairs to connect containers together. 
