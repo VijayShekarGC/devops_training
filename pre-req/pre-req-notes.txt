@@ -22,12 +22,14 @@ Shell Types:
   to execute the cmd.
 
 VI editor cmds:
-1. It has 2 modes, they are: 'command' mode(this will be the default modewhen VI is opened in terminal) and 'insert' mode.
+1. It has 3 modes, they are: 'command' mode(this will be the default modewhen VI is opened in terminal), 'insert' mode and 'lsat line' mode.
 2. In 'command' mode can give cmd to copy, paste, delete lines or word; navigate between lines ; but can not write .
-3. To switch to the insert mode, type lowercase i. To switch back from insert mode to the command mode, press 'Esc' key.
-operations are available in the command mode:
+3. To switch to the insert mode, type lowercase i. In this mode, files can be edited, new lines can be added or removed. To switch back from insert mode to the command mode, 
+   press 'Esc' key.
+4. To switch to last line mode, press ':' from command mode. In this mode, files can be saved, changes can be discarded and exit the editor.
+operations available in the command mode:
 	1. move around through the editor using the arrow keys.
-	2. To delete a character, press X.
+	2. To delete a character, press x.
 	3. Typing dd deletes the entire line.
 	4. To copy a line, type yy.
 	5. And to paste it, type in p.
@@ -37,7 +39,9 @@ operations are available in the command mode:
 	9. To discard any unsaved changes made to the file and quit VI, type in ':q'.
 	10. To save changes and quit, type in ':wq'.
 	11. type '/what_you_want_to_find_in_the_file' and all occurrences of the word 'what_you_want_to_find_in_the_file' is highlighted. To move your cursor to the occurrences, press n.
-
+	12. To undo the changes type u.
+	13. To redo the changes press ctrl + r.
+	14. To exit the editor without saving the editor, type in ':q!'
 
 
 Basic cmds:
@@ -236,7 +240,10 @@ DNS - Domain Name System
   the local etc hosts file for your web application and if you try to do an nslookup for that web application, it is not going to find it. The entry for your web application has 
   to be present in your DNS server. nslookup only queries the DNS server. 
 
-
+* The records are stored in the DNS server in the following ways:
+	1. 'A' records: IPv4 is stored with the corresponding hostnames.
+	2. 'AAAA' records: IPv6 is stored with the corresponding hostnames.
+	3. 'CNAME' records: mapping one name to another name. 
 
 
 
