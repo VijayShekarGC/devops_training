@@ -1,0 +1,209 @@
+Node:  A node is a worker machine (physical or virtual on which kubernetes is installed) were containers will be launched by kubernetes. Having multiple nodes helps in sharing 
+       load as well.
+Cluster: A cluster is a set of nodes grouped together. 
+Master: Its basically another node (with k8s installed and configured as master) which watches over other nodes in the cluster and orchestrates the containers in those nodes.
+
+
+* Main components of k8s are:
+	1. API server - It acts as the front end for kubernetes. The users, management devices, Command line interfaces communicates with it to interact with the kubernetes cluster.
+	2. ETCD service - It is a distributed reliable key-value store used by kubernetes to store all data used to manage the cluster. 
+	3. kubelet service - kubelet is the agent that runs on each node in the cluster. It is responsible for making sure that the containers are running on the nodes as expected.
+	4. container runtime - The container runtime is the underlying software that is used to run containers. 
+	5. controllers - These are the brain behind orchestration. They are responsible for noticing and responding when nodes, containers or endpoints goes down. The controllers
+					makes decisions to bring up new containers in such cases.
+	6. schedulers - It is responsible for distributing work or containers across multiple nodes. It looks for newly created containers and assigns them to Nodes.
+
+
+Differenitate b/w master and worker node:
+* The worker node is where the containers are hosted with container runtime like docker/rocker/crio. the worker nodes have the kubelet agent that is responsible for interacting 
+  with the master to provide health information of the worker node and carry out actions requested by the master. 
+* The master node is where the kube-apiserver is present. All the information gathered are stored in a key-value store 'Etcd', which will be present in the Master node.
+  Master also contains controller manager and the scheduler.
+
+
+
+kubectl:
+* The command line utilities for k8s is known as the kube command line tool or kubectl or kube control.
+* The kubectl is used to deploy and manage applications on a kubernetes cluster, to get cluster information, get the status of nodes in the cluster and many other things. 
+
+
+* Minikube is a tool used to setup a single instance of Kubernetes in an All-in-one setup.
+* kubeadmin is a tool used to configure kubernetes in a multi-node setup. 
+
+
+
+POD:
+* kubernetes does not deploy containers directly on the worker nodes. The containers are encapsulated into a Kubernetes object known as PODs. 
+  A POD is a single instance of an application. A POD is the smallest object, that can be created in kubernetes. 
+* PODs usually have a one-to-one relationship with containers running an given application. To scale UP create new PODs and to scale down delete PODs. 
+  Additional containers are not added to an existing POD to scale the given application.
+* A single POD CAN have multiple containers, except for the fact that they are usually not multiple containers of the same kind but are of differnt kind. That is those containers
+  wont be the same application container. These multiple containers are created together, destroyed together. The two containers can also communicate with each other directly by 
+  referring to each other as ‘localhost’ since they share the same network namespace. Plus they can easily share the same storage space as well. 
+  Multi-pod containers are a rare use-case.
+
+
+
+
+
+* Kubernetes uses YAML files as input for the creation of objects such as PODs, Replicas, Deployments, Services etc 
+* A kubernetes definition file always contains 4 top level fields. The apiVersion, kind, metadata and spec. These are top level or root level properties. 
+	
+	* apiVersion: This is the version of the kubernetes API we’re using to create the object. Depending on what we are trying to create we must use the RIGHT apiVersion. 
+	Few possible values for this field are apps/v1beta1, extensions/v1beta1 etc. This is in string format.
+	
+	* kind: The kind refers to the type of object we are trying to create. Some possible values here could be ReplicaSet or Deployment or Service. This is in string format.
+	
+	* metadata: The metadata is data about the object like its name, labels etc. This is in dictionary format. Under metadata, the name is a string value 
+	and the labels is a dictionary. So labels is a dictionary within the metadata dictionary.
+	
+	* spec: The last section in the configuration file is the specification which is written as spec. Depending on the object we are going to create, this is were we provide additional
+	information to kubernetes pertaining to that object. This is going to be different for different objects. Spec is a dictionary.
+
+
+Replication Controller:
+* Controllers are the brain behind Kubernetes. They are processes that monitor kubernetes objects and respond accordingly.  
+* The replication controller helps run multiple instances of a single POD in the kubernetes cluster thus providing High Availability. 
+* The replication controller ensures that the specified number of PODs are running at all times. Even if it’s just 1 or 100.
+* The replication controller can creates PODS in differnt nodes as well, if the physical capacity of the current POD is full and cant create any new PODS. Thus replication controller
+  spans across multiple nodes in the cluster. It helps us balance the load across multiple pods on different nodes as well as scale our application when the demand increases.
+
+
+ReplicaSet:
+* Replication Controller is the older technology that is being replaced by Replica Set. Replica set is the new recommended way to setup replication. 
+* The minor differences between them are: Replica set requires a selector definition in YAML file. The selector section helps the replicaset identify what pods fall under it. 
+   replica set can ALSO manage pods that were not created as part of the replicaset creation. The name of the key for selector is 'matchLabels'. This selector simply matches the 
+   labels specified under it to the labels on the PODs. 
+* The role of the replicaset is to monitor the pods and if any of them were to fail, deploy new ones. Labels are provided as a filter for replicaset so that it can monitor those PODS. 
+
+
+
+
+
+
+
+Deployments:
+* Deployment which is a kubernetes object that provides the capabilities to upgrade the underlying instances seamlessly using rolling updates, undo changes, and pause and resume 
+  changes to deployments.
+* The deployment automatically creates a replica set and the replicasets ultimately create pods. 
+* Whenever a new deployment is created or the images in an existing deployment are upgraded, a Rollout is triggered. A rollout is the process of gradually deploying or 
+  upgrading your application containers.A new rollout creates a new Deployment revision. This helps us keep track of the changes made to our deployment and enables us to 
+  rollback to a previous version of deployment if necessary.
+* There are two types of deployment strategies:
+	Recreate strategy: destroys all the running instances at once and then deploys new instances of the new application version. Here application goes down.
+	Rolling update: Take down the older version and bring up a newer version one by one. RollingUpdate is the default Deployment Strategy.
+* Kubernetes deployments allows to rollback to a previous revision. The deployment will then destroy the PODs in the new replicaset and bring the older ones up in the old replicaset. 
+
+
+
+
+
+
+
+
+
+
+Networking:
+* In Kubernetes the IP address is assigned to a POD. Each POD in kubernetes gets its own internal IP Address. When Kubernetes is initially configured it creates an 
+  internal private network and all PODs are attached to it.
+* When you deploy multiple PODs, they all get a separate IP assigned. The PODs can communicate to each other through this IP. PODs' internal IP address are subject to change 
+  when PODs are recreated. 
+* kubernetes expects us to setup networking to meet certain fundamental requirements. Some of these are:
+	All the containers or PODs in a kubernetes cluster MUST be able to communicate with one another without having to configure NAT. 
+	All nodes must be able to communicate with containers and all containers must be able to communicate with the nodes in the cluster. 
+
+
+
+
+
+
+
+
+
+Service:
+* The node will have an its own IP address and PODs inside that will have their own internal network and hence IP addresses will be different from the ones Node has. Range altogether
+  will be different and hence its not possible to communicate with the PODs directly.
+* Service is an kubernetes object just like PODs, Replicaset or Deployments.  
+* Service enable communication between various components within and outside of the application. Service enables connectivity between groups of PODs. services enable 
+  loose coupling between microservices in our application.
+* Service is in fact like a virtual server inside the node. Inside the cluster(Doubt - if this is inside the cluster or insdie the node) it has its own IP address. And that 
+  IP address is called the Cluster-IP of the service. 
+* There are many types of services:
+	1. NodePort: Service makes an internal POD accessible on one of the Ports on the Node by, listening to a port on the Node and forwarding requests to PODs running an application.
+	2. ClusterIP: Service creates a virtual IP inside the cluster to enable communication between different application services such as a set of front-end servers 
+	              to a set of backend-servers. Hence, k8s service helps group PODs together and provide a single interface to access the PODs in a group.
+	3. Loadbalancing: Service provisions a load balancer for the application service, in supported cloud providers.
+* NodePort: There are 3 ports involved:
+	1. targetPort: The port on the POD where the actual web server/application is running. This is where the service forwards the requests to finally.
+	2. port: the port on the service itself.
+	3. NodePort: the port on the Node itself which we use to access the web server externally. NodePorts can only be in a valid range which is from 30000 to 32767.
+	
+	* In config YAML files, the only mandatory field is port . If targetPort is not provided then k8s service assumes it to be the same as port.  If nodePort is not provided then
+	  a free port in the valid range between 30000 and 32767 is automatically allocated by k8s service. Also note that ports is an array type in the config file.
+	* To connects the service to PODs, use labels and selectors. After the service is created, if more than one PODs matched with the labels then the service then automatically selects 
+	  all those PODs as endpoints to forward the external requests. There is no need for any additional configuration to perform this. The algorithm used to balance load is
+	  random algorithm. Thus the service acts as a built-in load balancer to distribute load across different PODs.
+	* k8s creates a service that spans across all the nodes in the cluster and maps the target port to the SAME NodePort on all the nodes in the cluster. This way the application can be
+	  accessed using the IP of any node in the cluster and using the same port number. All of this does not require additional configuration.
+
+* ClusterIP:   
+	* Each service gets an IP and name assigned to it inside the cluster and that is the name that should be used by other PODs to access the service. This type of service is 
+	  known as ClusterIP.
+	* Consider a service created for application-1 and another service for application-2. service created for application-1 PODs will group all the application-1 PODs together 
+	  and provide a single interface for application-2 PODs(any other services as well) to access this service. The requests from are forwarded to one of the PODs under the service
+	  randomly.
+	* Due to above mechanism, service enables easy and effective way to deploy a microservices based application on kubernetes cluster. Each layer can now scale or move as required
+      without impacting communication between the various services. 
+	* In config YAML files, ClusterIP is the default type of the service, so even if the service is not specified then k8s will automatically assume it to be ClusterIP. 
+
+* Loadbalancing:
+	* To access an application by the user, IP addresses of all the nodes hosting the application can be useed but it is not the appropriate way. A better way would be 
+	  having one single IP. 
+	* K8s services creates a loadbalancer for the above purpose thus giving single IP for the user. 
+	* For the Loadbalancer service, k8s leverages the native load balancing functionalities of the cloud platform to set the service up. K8s has built-in integration with 
+	  supported cloud platforms.	
+
+
+
+
+
+
+
+
+
+
+
+kubectl cmds:
+* To deploy a container by creating a POD:
+	kubectl run container_name --image=image_name
+
+* To get info on the pods/service/deployments/replicaSet created:
+	kubectl get pods
+  use '-o wide' along with the above cmd, to ge deatiled info.
+
+* To create pods/service/deployments/replicaSet
+	kubectl create -f file_name.yaml
+
+* To see detailed information about the pods/service/deployments/replicaSet
+	kubectl describe pod/service/deployment/replicaSet name_of_pod/service/deployment/replicaSet
+	
+* To delete pods/service/deployments/replicaSet
+	kubectl delete pod/service/deployment/replicaSet name_of_pod/service/deployment/replicaSet
+	
+* To edit/update pod/service/deployment/replicaSet:
+	kubectl edit pod/service/deployment/replicaSet name_of_pod/service/deployment/replicaSet
+
+* To scale up/down replicas:
+	kubectl scale rs name_of_replica_set --replicas=2
+	
+* To see all the created objects at once
+	kubectl get all 
+
+* To see the status of rollout
+	kubectl rollout status name_of_the_deployment
+
+* To see the revisions and history of rollout 
+	kubectl rollout history name_of_the_deployment
+
+* To undo a change or to rollback 
+	kubectl rollout undo name_of_the_deployment
