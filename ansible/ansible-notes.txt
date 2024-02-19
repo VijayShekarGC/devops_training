@@ -1,0 +1,81 @@
+Ansible:
+* Ansible is a powerful IT automation tool to automate the most complex deployments. Set up complex infrastructure that spans across public clouds like amazon and private clouds like VMWare, 
+  that includes provision hundreds of VMs, to configuring applications on those and setting up communication between them, such as modifying configuration files, installing 
+  applications on them, configuring firewall rules, etc. 
+* Ansible is 'Agentless' which means it doesn't need to install any additional software on the target machines to be able to work with Ansible. A simple SSH connectivity would 
+  suffice Ansible's needs.
+  
+  
+Inventory:
+* Ansible can work with one or multiple systems in the infrastructure at the same time by establishing connectivity to those servers by using SSH for Linux & PowerShell remoting 
+  for windows.
+* Information about the target systems is stored in an inventory file. If a new inventory file is not created, then the default inventory file at '/etc/ansible/hosts'.
+* The inventory file is in an 'ini' like format. It's simply a number of servers listed one after the other, can also group different servers together, can have multiple groups
+  defined in a single inventory file.
+  
+Basic Example file:
+
+  """
+  server1.company.com
+  server2.company.com
+  server3.company.com
+  
+  [mail]
+  server4.company.com
+  server5.company.com
+  server6.company.com
+  
+  [db]
+  server7.company.com
+  server8.company.com
+  server9.company.com
+  
+  """
+
+Inventory parameters: 
+	1. ansible_host: This is the Host name or IP address of the target machine for the given alias. Ex: db ansible_host=server1.company.com
+	2. ansible_connection: The type of connection the target machine can accept. It can be 'ssh' for linux and 'winrm' for windows and 'localhost' for localhost.
+	3. ansible_port: port number the target machine the target machine can accept connection. For ssh port number is 22.
+	4. ansible_user: defines the user used to make remote connections. By default, this is set to root for Linux and admin for windows.
+	5. ansible_ssh_pass: defines the SSH password for Linux. 
+
+Example file:
+	
+	"""
+	db   ansible_host=server1.company.com ansible_connection=ssh   ansible_user=root
+    mail ansible_host=server2.company.com ansible_connection=ssh   ansible_user=root
+    web  ansible_host=server3.company.com ansible_connection=winrm ansible_user=admin
+	
+	"""
+
+
+
+
+Playbooks:
+* Ansible playbooks are Ansible's orchestration language. All playbooks are written in YAML. 
+* A playbook is a single YAML file containing a set of plays.
+* A play defines a set of activities/tasks to be run on a single or a group of hosts.
+* A task is a single action to be performed on a host. Some examples of a task are executing a command or a script on the host, installing a package on the host etc.
+* The playbook is a list of dictionaries in YAML terms. Each play is a dictionary & has a set of properties called name, hosts, and tasks. 'tasks' is a list or an array.
+* The host parameter indicates which hosts the operations need to run on. The host which performs these operations against is always set at a play level. The host or the group of the
+  host needs to be defined in the inventory file before hand. If a group is specified in host parameter then all the tasks will be executed for all the hosts in that group.
+* To execute a playbook,
+	ansbile-playbook name_of_playbook.yaml
+
+
+Modules:
+* The different actions run by tasks are called modules. Some of the different modules are command, script, yum, service. 
+* Ansible modules are categorized into various groups based on their functionality:
+	1. System: System modules are actions to be performed at a system level such as modifying the users and groups on the system, modifying iptables, firewall configurations on 
+				the system, working with logical volume groups, mounting operations, or working with services. 
+	2. Command: Command modules are used to execute commands or scripts on a host. These could be simple commands using the command module or an interactive execution using the 
+				expect module by responding to prompts.
+	3. File: File modules help work with files. For ex: Use the archive and unarchive modules to compress and unpack files. Use find, lineinfile and replace modules to modify
+				the contents of an existing file. 
+	4. Database: Database modules help in working with databases such as MongoDB, MySQL, MSSQL, or PostgreSQL to add or remove databases or modify database configurations. 
+	5. Cloud: The cloud section has a vast collection of modules for various different cloud providers like Amazon, Azure, Docker, Google etc. There are a number of modules
+				available for each of these that allow you to perform various tasks such as creating and destroying instances, performing configuration changes
+				in networking & security, managing containers, datacenters, clusters, virtual networking, VSAN etc. 
+* 
+			
+	

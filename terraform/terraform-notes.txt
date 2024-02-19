@@ -1,0 +1,343 @@
+Infrastructure as Code - IAC
+	Better way to provision infrastructure is through code, which means through code infrastructure/resources are defined, configured, updated & destroyed. Resources can be databases, networks, storage, application configuration etc. 
+
+* IAC can be divided into 3 types:
+	a. Configuration Management tools: Ansible, puppet, Saltstack
+	b. Server Templating tools: Vagrant, Packer, Docker
+	c. Infrastructure Provisioning Tools: Terraform(vendor agnostic), Cloudformation(for AWS only)
+	
+* Terraform can deploy infrastructure across public & private cloud and on-prem as well. Terraform manges infrastructure on all these platforms by 'providers'. A 'provider' helps
+  terraform manage 3rd party platforms through their APIs. 
+
+* Terraform uses HCL - Hasicrop Configuration Language - a simple declarative langauage to define infrastructure resources to be provisioned as blocks of code. All resources can be 
+  defined in configuration file with '.tf' extension. Here 'declarative' implies that the code which is defined is the state that we want the infrastructure to be in which can be 
+  called as 'desired' state and the actual state of the infrastructure will be called as 'current' state. 
+
+* Terraform has 3 phases: Init, Plan & Apply 
+	a. Init: During this phase, terraform initializes the project & identifies the providers to be used for targeted environments.
+	b. Plan: During this phase, terraform drafts a plan to get to the desired state. 
+	c. Apply: During this phase, terraform applys the neccesary changes and gets to the desired state. 
+
+* Every object terraform manages is called a resource. It can be compute instance, database server in cloud, physical server in on-prem etc. Terraform manges the resources' life 
+  cycle from provisioning, to configuration & to decommisioning.
+
+* HCL syntax: HCL consists of "blocks" and "arguments". Each block contain key-value pairs which represent configuration data & is defined in curly braces. 
+	
+	Example:
+		resource "local_file" "pet"{
+			filename = ''
+			content = ''
+		}
+	
+	In the above example 'resource' is a type of block; 'local_file' is a resource type and 'pet' is resource name. 
+
+
+* To update a resource: Update the resource block with the required update and run "terraform plan". This cmd will replace the resource which means it will delete & recreate the
+  resource. This type of infrastructure is called "Immutable infrastructure".
+  To delete the infrastructure completely run "terraform destroy" cmd. 
+  
+* When "terraform init" cmd is run, it reads the configuration files in the directory and downloads plugins for the resources mentioned in the configuration files and this will be 
+  visible in cmd line output. Plugins are downloaded to a hidden directory called ".plugin" where the cmd is run. By default terraform downloads latest versions of the plugins.
+  When updating the configuration file with a new provider(as terraform supports mulitple providers), always run "terraform init" cmd again as terraform needs to download the new 
+  provider's plugin. 
+  
+* Variables can be assigned to be arguments of a block in main.tf file in configuration directory. Variables will be defined in "variables.tf" file in the same directory as shown 
+  below:
+	Syntax:
+		variable "argument_name"{
+			default = "some string value"
+		}
+	Example:
+		variable "filename"{
+			default = "test.txt"
+		}
+  
+  Now to use the above mentioned variabled in main.tf:		
+		resource "local_file" "pet"{
+			filename = var.filename
+		}
+
+* variable block has 3 arguments. They are: 'default', 'type' & 'description'. All 3 are optional. If 'type' argument is used then it enforces that type is used in 'default'
+  argument.
+  'type' argument has 9 possible values:
+	1. string(alphanumeric) 
+	2. number(+ve or -ve)
+	3. bool(true or false)
+	4. any(if not mentioned then by default 'any' is used)
+	5. list: Each element of list are indexed and can be accessed in main.tf based on their index.
+		Ex: 
+		variable.tf
+			variable "filename"{
+				default=["hello", "hi"]
+				type = list
+			}
+		main.tf
+			resource "local_file" "pet"{
+				filename = var.filename[0]
+			}
+	  We can also constraint the contents of the list. We can use 'list(num)' which will constraint the list to have all of its elements as number & 'list(string)' which will constraint the list to have all of its elements as string
+	6. map: Each element of list are key=value pairs and can be accessed in main.tf based on the keys.
+		Ex:		
+		variable.tf
+			variable "filename"{
+				default={'key1' = "hello", 'key2' = "hi"}
+				type = map
+			}
+		main.tf
+			resource "local_file" "pet"{
+				filename = var.filename['key1']
+			}
+	  We can also constraint the contents of the values in key-value pair. We can use 'map(num)' which will constraint the map to have all of its values as number & 'map(string)' which will constraint the map to have all of its values as string
+	7. set: set is same as list but the only difference is that it can not have duplicate elements in it. We can also use type constraint on set just like list.
+	8. tuple: tuple is same as list but the only difference is that it can contain elements of different type. Like it can list of number, string & bool whereas list uses same 
+		datatype elements in it. 
+		Ex: 
+		variable.tf
+			variable "filename"{				
+				type = tuple(['number','string','bool'])
+				default=[1, "hi", true]
+			}
+		main.tf
+			resource "local_file" "pet"{
+				filename = var.filename[1]
+			}
+	9. object: This is a data structure which is a combination all the above data structures.
+		Ex:
+		variable.tf	
+			variable "bella"{
+				type = object({
+					name = string
+					age = number
+					food = list(string)
+					fav_pet = bool
+				})
+				default = {
+					name = "bella"
+					age = 5
+					food = ['fish', 'chicken']
+					fav_pet = true
+				}
+			}
+* If 'default' is not mentioned in variables.tf file then after running 'terraform apply' cmd then we will be prompted to enter the values in interactive mode. We can also use flag 
+  option if we dont want provide inputs through interactive mode. 
+  Ex: 
+	terraform apply -var "filename=/root/pets.txt" -var "content=Hello" -var "age=3"
+  
+* We can also use environment variable. Those environment variable should be like "TF_VAR_variablename"
+  Ex: 
+	export TF_VAR_age='3'
+	export TF_VAR_content='Hello'
+	terraform apply
+  
+* If we are to deal with many variables then we can load values by using variable definition file with the name & extension 'terraform.tfvars' / 'terraform.tfvars.json' /
+  '*.auto.tfavrs' / '*.auto.tfavrs.json' and terraform loads these values automatically, without being specified separately during 'terraform apply' cmd. If we are not using above
+  mentioned 4 filenames/extension then terraform wont load it automatically and we will have to use a flag -var-file in 'terraform apply' cmd.
+  Ex: 
+  terraform.tfvars
+	filename='/root/pets.txt'
+	age='3'
+  terraform apply
+  
+  all_variables.tfvars
+	filename='/root/pets.txt'
+	age='3'
+  terraform apply -var-file all_variables.tfvars
+  
+* Order of precedence of variable definitions are:
+	-var flag option > *.auto.tfvars > terraform.tvars > environment variables
+
+
+
+* Resource Attributes: If we want to assign the value of any attribute of any resource which is available after creating that resource then it can be done through 'interpolation' 
+  expression.
+  Syntax:
+	${resource_type.resource_name.attribute}
+  Ex:
+	resource "local_file" "pets"{
+		filename="/roots/pets.txt"
+		content="My fav pet is ${random_pet.my-pet.id}"
+	}
+	resource "random_pet" "my-pet"{
+		blah
+		blah
+	}	
+	
+	here the resource of type "random_pet" & name "my-pet" creates an attribute called 'id' and hence the expression will be ${random_pet.my-pet.id}.
+
+* While creating the resources terraform creates resource "random_pet" & name "my-pet" first then creates resource "local_file". While destroying resources, terraform 
+  deletes in reverse order i.e, deletes resource "local_file" first & then resource "random_pet". Here terraform understands the resource dependency by itself, hence this type of
+  dependency is called "Implicit dependency"
+	
+* 2nd type of dependency is called explicit dependency. Here resouces might not be using the interpolation expression and it might be indirectly depending. In that case:
+	
+	resource "local_file" "pets"{
+		filename="/roots/pets.txt"
+		content="My fav pet is cat."
+		depends_on = [random_pet.my-pet]
+	}
+	resource "random_pet" "my-pet"{
+		blah
+		blah
+	}	
+	
+	This will ensure resource "local_file" is created only after resource "random_pet".
+
+* Output Variables: 
+	Syntax: 
+		output variable_name{
+			value = value_of_output_variable
+			description = "blah blah blah"
+		}
+	
+	Ex:
+	resource "local_file" "pets"{
+		filename="/roots/pets.txt"
+		content="My fav pet is ${random_pet.my-pet.id}"
+	}
+	resource "random_pet" "my-pet"{
+		blah
+		blah
+	}	
+	output pet-name{
+		value = random_pet.my-pet.id
+		description = "blah blah blah"
+	}
+	
+	Run 'terraform output' cmd to get the output variable pet-name to be displayed on the screen.
+
+
+
+* Terraform State: After running terraform apply cmd, terraform creates a file 'terraform.tfstate' in the directory. This contains all the details of resources created. Now when
+  changes are made and plan cmd is run again, it compares the values stored in 'terraform.tfstate' and understands that there is change in infrastructure. After running apply cmd,
+  'terraform.tfstate' gets updated with the new change. File 'terraform.tfstate' also contains info regarding resource dependencies which will also be used during resources
+  deletion. State file will also contain sensitive information like IP address, secrets etc. Hence state files should not be stored in git repos & should be stored in remote cloud 
+  storages like S3, consul etc.
+
+
+
+* Other terraform commands: 
+	1. terraform validate: This checks the syntax of the files and notifies if any errors. 
+	2. terraform fmt: This formats the terraform files in the directory to a canonical format.   
+	3. terraform show: This displays the current state of the infrastructure as seen by terraform.
+	4. terraform providers: This displays all the providers used in the configuration files.
+	5. terraform refresh: This cmd is used to sync terraform with real-world infrastructure as changes can be made to the infrastructure manually and updates the state file acc.
+	6. terraform graph: This gives a visual representation of the dependencies, configuration & exceution plans. 
+
+
+* Immutable & Mutable Infrastructure: After applying config changes, if infra is destroyed and recreated again then that type of infra is immutable. If infra is not destroyed and 
+  changes are made then that type of infra is called mutable. In terraform, most of the infra are immutable.
+
+* As most of the infra are immutable, destroying resources is not favorable. To prevent this we have life-cycle rules concept for the resources. There are 3 main life-cycle rules:
+  They are:
+	1. create_before_destroy: This rule makes sure that resource is created before deleting the existing resource as usually resource is deleted first before creating while applying
+	                          the config changes.
+	2. prevent_destroy: This rule makes sure that existing resource is not deleted even after creating the new resource with the updated version.
+	3. ignore_changes: If some manual changes are done to resource and terraform apply cmd is run then with this rule it makes sure that the changes attribute mentioned in this rule
+	                   are not overridden with the changes from code and those attributes are ignored.
+
+	Ex:
+	resouce "local_file" "my_file"{
+		filename="hi.txt"
+		content="hi"
+		
+		lifecycle{
+			create_before_destroy = true
+		}
+	}
+		
+	resouce "local_file" "my_file"{
+		filename="hi.txt"
+		content="hi"
+		
+		lifecycle{
+			prevent_destroy = true
+		}
+	}
+	
+	resouce "local_file" "my_file"{
+		filename="hi.txt"
+		content="hi"
+		
+		lifecycle{
+			ignore_changes = [content]
+		}
+	}
+
+
+* Datasources: There will be infrastructure created by other than terraform and those will be not under controll of terraform. But terraform can use this as source of data while 
+  managing its own resource. Using "data" block we can use that resource as data. 
+  Ex:
+	Assume there is a file dogs.txt with some content at a given directory.
+	resource "local_file" "pets"{
+		filename="/roots/pets.txt"
+		content=data.local_file.dog.content
+	}
+	
+	data "local_file" "dog"{
+		filename="/roots/dogs.txt"
+	}
+
+
+* Count: To create more than 1 resources terraform has concept of 'count' which is similar to 'loops' in programming language. 'count' is another argument in a block(also called as
+  meta-arguemnt). If we assign a output variable to the count and display it then we will see that count variable stores the values in a list. 
+  Ex:
+  
+  variables.tf
+  variable ""filename"{
+	default = ['hi.txt', 'hello.txt', 'hi2.txt']
+  }
+  
+  main.tf
+  resource "local_file" "pet"{
+	filename=var.filename[count.index]
+	count = length(var.filename)
+  }
+  
+  Drawback of this approach is when the first element is removed from the list of filename and apply cmd is run again, it destroys the other 2 elements and recreates it again. This
+  happens as the next 2 elements move up in the index and as the index are changed terraform will destroy and recreate the last 2 elements. This is not favorable all the times.
+  
+* for_each: To overcome the drawback of count meta-arguemnt, for_each meta-arguemnt is introduced. This argument expects a set or map in variable definition file. If we assign a
+  output variable to for_each and display it then we will see that for_each stores the values in a map.
+  Ex:
+  variables.tf
+  variable ""filename"{
+  type = set(string)
+	default = ['hi.txt', 'hello.txt', 'hi2.txt']
+  }
+  
+  main.tf  
+  resource "local_file" "pet"{
+	filename=each.value
+	for_each = var.filename
+  }
+
+
+
+
+
+
+Terraform with AWS:
+* Terraform needs to the AWS access keys as it needs to for whom the resources needs to created/updated/deleted. This can be achieved by hardcoding access keys ID & secret key in 
+  main.tf file which is for non prod env; by setting aws creds in the machine which runs the terrform operations; by setting the access key ID and secret as env variables in that machine with vriable name - "AWS_ACCESS_KEY_ID" & "AWS_SECRET_ACCESS_KEY_ID".
+  
+
+
+State Locking:
+* Terraform ensures the 'statefile' doesnt get corrupted by running mutliple run commands concurrently at the same time. 
+
+Remote State:
+* To ensure misuse of statefile accidently or intentionly, statefile should not be stored in git repos as git repos do not support state locking as terraform does. These files needs to be
+  stored in 'Remote Backends' like AWS S3, Hashicorp consul, terraform cloud etc. Many of these backends supports state locking thus ensuring integerity and security of statefiles. 
+  This 'remote backend' needs to be configured by terraform itself and when configured terraform will automatically upload the 'statefiles' after every apply cmd and load the 'statefiles'
+  to remote storage everytime it is required by any terraform operations. 
+    
+* To define remote backends in terraform scripts, use the 'terraform' block. This block usually should not be configured in the main.tf file.
+  Syntax:
+  	terraform{
+  		backend 'resource_name_like_s3'{
+  			mandatory_parameter = 'something'
+  		}
+  	}
+
+
+
